@@ -257,6 +257,7 @@ JsonElement *JsonIntegerCreate64(int64_t value);
 JsonElement *JsonRealCreate(double value);
 JsonElement *JsonBoolCreate(bool value);
 JsonElement *JsonNullCreate();
+JsonElement *JsonPrimitiveCreate(JsonPrimitiveType type, const char *value);
 
 
 //////////////////////////////////////////////////////////////////////////////

@@ -1621,6 +1621,11 @@ JsonElement *JsonNullCreate()
     return JsonElementCreatePrimitive(JSON_PRIMITIVE_TYPE_NULL, JSON_NULL);
 }
 
+JsonElement *JsonPrimitiveCreate(JsonPrimitiveType type, const char *value)
+{
+    return JsonElementCreatePrimitive(type, value);
+}
+
 // *******************************************************************************************
 // Printing
 // *******************************************************************************************
