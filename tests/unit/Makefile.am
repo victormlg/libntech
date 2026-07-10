@@ -84,7 +84,8 @@ check_PROGRAMS = \
 	libcompat_test \
 	definitions_test \
 	glob_lib_test \
-	string_sequence_test
+	string_sequence_test \
+	date_parser_test
 
 if WITH_PCRE2
 check_PROGRAMS += \
