@@ -473,6 +473,7 @@ dnl ######################################################################
 AC_C_CONST
 
 AC_FUNC_FSEEKO
+AC_FUNC_ALLOCA
 AC_SYS_LARGEFILE
 AC_TYPE_OFF_T
 
