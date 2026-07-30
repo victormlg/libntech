@@ -1,5 +1,5 @@
 #
-#  Copyright 2021 Northern.tech AS
+#  Copyright 2026 Northern.tech AS
 #
 #  This file is part of CFEngine 3 - written and maintained by Northern.tech AS.
 #
@@ -47,25 +47,31 @@ if test x"$GCC" = "xyes" && test x"$HP_UX_AC" != x"yes"; then
     CF3_CFLAGS="$CF3_CFLAGS -std=gnu99 -g -Wall"
     AC_MSG_RESULT(yes)
 
+    dnl Save CFLAGS to restore after using it to test for compiler flag support
+    save_CFLAGS="$CFLAGS"
     AC_MSG_CHECKING(for -Wno-pointer-sign)
+    CFLAGS="-Wno-pointer-sign"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() {}])],
      [AC_MSG_RESULT(yes)
      CF3_CFLAGS="$CF3_CFLAGS -Wno-pointer-sign"],
      [AC_MSG_RESULT(no)])
 
     AC_MSG_CHECKING(for -Werror=implicit-function-declaration)
+    CFLAGS="-Werror=implicit-function-declaration"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() {}])],
      [AC_MSG_RESULT(yes)
      CF3_CFLAGS="$CF3_CFLAGS -Werror=implicit-function-declaration"],
      [AC_MSG_RESULT(no)])
 
     AC_MSG_CHECKING(for -Wunused-parameter)
+    CFLAGS="-Wunused-parameter"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() {}])],
      [AC_MSG_RESULT(yes)
      CF3_CFLAGS="$CF3_CFLAGS -Wunused-parameter"],
      [AC_MSG_RESULT(no)])
 
     AC_MSG_CHECKING(for -Wno-incompatible-pointer-types)
+    CFLAGS="-Wno-incompatible-pointer-types"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() {}])],
      [AC_MSG_RESULT(yes)
      CF3_CFLAGS="$CF3_CFLAGS -Wno-incompatible-pointer-types"],
@@ -78,6 +84,7 @@ if test x"$GCC" = "xyes" && test x"$HP_UX_AC" != x"yes"; then
     dnl GCC irregularities checking for -Wno-* command-line options
     dnl (command line is not fully checked until actual warning occurs)
     AC_MSG_CHECKING(for -Wno-duplicate-decl-specifier)
+    CFLAGS="-Wno-duplicate-decl-specifier"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([#ifndef __clang__
 # error Not a clang
 #endif
@@ -85,6 +92,8 @@ int main() {}])],
      [AC_MSG_RESULT(yes)
      CF3_CFLAGS="$CF3_CFLAGS -Wno-duplicate-decl-specifier"],
      [AC_MSG_RESULT(no)])
+    dnl restore CFLAGS
+    CFLAGS="$save_CFLAGS"
 else
     AC_MSG_RESULT(no)
 fi
