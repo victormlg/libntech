@@ -41,7 +41,8 @@ JsonElement *JsonReadDataFile(
         const char *log_identifier,
         const char *input_path,
         DataFileType requested_mode,
-        size_t size_max);
+        size_t size_max,
+        bool ignore_errors);
 DataFileType GetDataFileTypeFromString(const char *requested_mode);
 DataFileType GetDataFileTypeFromSuffix(const char *filename);
 const char *DataFileTypeToString(DataFileType type);
