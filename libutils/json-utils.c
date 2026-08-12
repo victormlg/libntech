@@ -222,9 +222,6 @@ bool JsonParseEnvFile(const char *input_path, size_t size_max, JsonElement **jso
 
     if (!reached_eof && byte_count <= size_max)
     {
-        Log(LOG_LEVEL_ERR,
-            "%s: failed to read ENV file '%s'. (fread: %s)",
-            myname, input_path, GetErrorStr());
         JsonDestroy(json);
         return false;
     }
@@ -297,9 +294,6 @@ bool JsonParseCsvFile(const char *input_path, size_t size_max, JsonElement **jso
 
     if (!reached_eof && byte_count <= size_max)
     {
-        Log(LOG_LEVEL_ERR,
-            "%s: unable to read line from CSV file '%s'. (fread: %s)",
-            myname, input_path, GetErrorStr());
         JsonDestroy(json);
         fclose(fin);
         return false;
@@ -320,7 +314,7 @@ bool JsonParseCsvFile(const char *input_path, size_t size_max, JsonElement **jso
 }
 
 JsonElement *JsonReadDataFile(const char *log_identifier, const char *input_path,
-                              const DataFileType requested_mode, size_t size_max)
+                              const DataFileType requested_mode, size_t size_max, bool ignore_errors)
 {
     const char *myname = log_identifier ? log_identifier : "JsonReadDataFile";
     bool env_mode = (requested_mode == DATAFILETYPE_ENV);
@@ -341,6 +335,15 @@ JsonElement *JsonReadDataFile(const char *log_identifier, const char *input_path
         }
         if (success == false)
         {
+            if (!ignore_errors)
+            {
+                return NULL;
+            }
+            const char *file_type = env_mode ? "ENV" : "csv";
+            const char *myname = env_mode ? "JsonParseEnvFile" : "JsonParseCsvFile";
+            Log(LOG_LEVEL_ERR,
+                "%s: failed to read %s file '%s'. (fread: %s)",
+                myname, file_type, input_path, GetErrorStr());
             return NULL;
         }
         return json;
@@ -349,6 +352,16 @@ JsonElement *JsonReadDataFile(const char *log_identifier, const char *input_path
     JsonElement *json = NULL;
     JsonParseError res =
         JsonParseAnyFile(input_path, size_max, &json, yaml_mode);
+
+    if (!ignore_errors)
+    {
+        if (json != NULL && JsonGetElementType(json) == JSON_ELEMENT_TYPE_PRIMITIVE)
+        {
+            JsonDestroy(json);
+            return NULL;
+        }
+        return json;
+    }
 
     if ((res == JSON_PARSE_ERROR_NO_DATA) || (res == JSON_PARSE_ERROR_NO_SUCH_FILE))
     {
