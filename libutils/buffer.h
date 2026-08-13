@@ -93,7 +93,7 @@ Buffer* BufferNewFrom(const char *data, size_t length);
 void BufferDestroy(Buffer *buffer);
 
 /**
-  @brief Destroys a buffer structure returning the its contents.
+  @brief Destroys a buffer structure returning its contents.
   @param buffer Structure to operate on.
   @return Contents of the buffer.
   */
