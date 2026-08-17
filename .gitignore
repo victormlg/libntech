@@ -94,6 +94,7 @@ stamp-h1
 /libutils/regex.h
 /libutils/glob_lib.h
 /libutils/json-yaml.h
+/libutils/parsedate.c
 
 # examples
 /examples/cfengine_stdlib.cf

@@ -26,6 +26,11 @@ noinst_LTLIBRARIES = libutils.la
 AM_CFLAGS   = $(CORE_CFLAGS)   $(PCRE2_CFLAGS)   $(OPENSSL_CFLAGS)
 AM_CPPFLAGS = $(CORE_CPPFLAGS) $(PCRE2_CPPFLAGS) $(OPENSSL_CPPFLAGS)
 AM_LDFLAGS  = $(CORE_LDFLAGS)  $(PCRE2_LDFLAGS)  $(OPENSSL_LDFLAGS)
+if DARWIN
+AM_YFLAGS = -d -p parsedate_yy
+else
+AM_YFLAGS = -d -p parsedate_yy -Wno-deprecated
+endif
 
 libutils_la_LIBADD = ../libcompat/libcompat.la $(PCRE2_LIBS) $(OPENSSL_LIBS) $(SYSTEMD_LOGGING_LIBS) $(LIBYAML_LIBS)
 
@@ -81,7 +86,8 @@ libutils_la_SOURCES = \
 	version_comparison.c version_comparison.h \
 	writer.c writer.h \
 	xml_writer.c xml_writer.h \
-	glob_lib.c glob_lib.h
+	glob_lib.c glob_lib.h \
+	parsedate.y parsedate.h
 
 EXTRA_DIST = stack_base.c
 

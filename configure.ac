@@ -95,6 +95,7 @@ AC_PROG_CC
 AC_PROG_MKDIR_P
 AC_EXEEXT
 
+AM_CONDITIONAL([DARWIN], [AS_CASE([$target_os], [darwin*], [true], [false])])
 AS_CASE([${target_os}],
 [darwin*], [
     AC_CHECK_PROG([BREW], [brew], [brew])
