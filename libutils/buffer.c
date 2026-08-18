@@ -24,6 +24,7 @@
 #include <platform.h>
 #include <alloc.h>
 #include <buffer.h>
+#include <file_lib.h>           /* FullRead() */
 #include <refcount.h>
 #include <misc_lib.h>
 #ifdef WITH_PCRE2
@@ -302,6 +303,29 @@ void BufferAppend(Buffer *buffer, const char *bytes, size_t length)
         buffer->used += length;
         break;
     }
+}
+
+bool BufferAppendFileContent(Buffer *buffer, int fd)
+{
+    assert(buffer != NULL);
+
+    char bytes[4096];
+    ssize_t n_read;
+    do
+    {
+        n_read = FullRead(fd, bytes, sizeof(bytes));
+        if (n_read < 0)
+        {
+            return false;
+        }
+
+        BufferAppend(buffer, bytes, (size_t) n_read);
+
+        /* FullRead() reads until the requested amount or end of file, so a
+         * short read means we have it all. */
+    } while ((size_t) n_read == sizeof(bytes));
+
+    return true;
 }
 
 void BufferAppendChar(Buffer *buffer, char byte)
