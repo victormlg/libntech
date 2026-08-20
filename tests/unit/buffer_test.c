@@ -5,6 +5,7 @@
 #include <string.h>
 #include <cmockery.h>
 #include <buffer.h>
+#include <file_lib.h>
 
 static void test_createBuffer(void)
 {
@@ -599,6 +600,54 @@ static void test_vprintf(void)
     free(char0int0char1double0);
 }
 
+static void test_appendFileContent(void)
+{
+    /* Sizes around the 4096 byte chunk BufferAppendFileContent() reads in, so
+     * that both the short-read and the exact-multiple cases are covered. */
+    const size_t sizes[] = { 0, 1, 4095, 4096, 4097, 8192, 100000 };
+
+    for (size_t i = 0; i < sizeof(sizes) / sizeof(*sizes); i++)
+    {
+        const size_t size = sizes[i];
+        char *expected = xmalloc(size + 1);
+        for (size_t j = 0; j < size; j++)
+        {
+            expected[j] = 'a' + (j % 26);
+        }
+        expected[size] = '\0';
+
+        char filename[] = "/tmp/buffer_test_XXXXXX";
+        int fd = mkstemp(filename);
+        assert_true(fd >= 0);
+        assert_int_equal(size, FullWrite(fd, expected, size));
+        assert_int_equal(0, lseek(fd, 0, SEEK_SET));
+
+        Buffer *buffer = BufferNew();
+        BufferAppendString(buffer, "prefix:");
+        assert_true(BufferAppendFileContent(buffer, fd));
+        assert_int_equal(strlen("prefix:") + size, BufferSize(buffer));
+        assert_int_equal(0, memcmp(BufferData(buffer) + strlen("prefix:"), expected, size));
+
+        BufferDestroy(buffer);
+        close(fd);
+        unlink(filename);
+        free(expected);
+    }
+
+    /* Reading from a descriptor which is not open for reading fails. */
+    char filename[] = "/tmp/buffer_test_XXXXXX";
+    int fd = mkstemp(filename);
+    assert_true(fd >= 0);
+    close(fd);
+    int wronly_fd = open(filename, O_WRONLY);
+    assert_true(wronly_fd >= 0);
+    Buffer *buffer = BufferNew();
+    assert_false(BufferAppendFileContent(buffer, wronly_fd));
+    BufferDestroy(buffer);
+    close(wronly_fd);
+    unlink(filename);
+}
+
 int main()
 {
     PRINT_TEST_BANNER();
@@ -611,6 +660,7 @@ int main()
         unit_test(test_copyCompareBuffer),
         unit_test(test_setBuffer),
         unit_test(test_appendBuffer),
+        unit_test(test_appendFileContent),
         unit_test(test_append_boundaries),
         unit_test(test_printf),
         unit_test(test_vprintf)

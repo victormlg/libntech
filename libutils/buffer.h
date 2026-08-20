@@ -148,6 +148,15 @@ void BufferAppendF(Buffer *buffer, const char *format, ...);
 void BufferAppendString(Buffer *buffer, const char *str);
 
 /**
+  @brief Appends everything that can be read from a file descriptor.
+  @param buffer Structure to operate on.
+  @param fd File descriptor to read from, until end of file.
+  @return Whether everything was read successfully. On failure, errno is set by
+  read(2) and the buffer contains whatever was read before the failure.
+  */
+bool BufferAppendFileContent(Buffer *buffer, int fd);
+
+/**
   @brief Stores complex data on the buffer.
 
   This function uses the same semantic and flags as printf. Internally it might or not call sprintf, so do not depend on obscure
