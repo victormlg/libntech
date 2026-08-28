@@ -30,4 +30,9 @@ void CallCleanupFunctions(void);
 void DoCleanupAndExit(int ret) FUNC_ATTR_NORETURN;
 void RegisterCleanupFunction(CleanupFn fn);
 
+/**
+ * Discards all currently registered cleanup functions without calling them.
+ */
+void ClearCleanupFunctions(void);
+
 #endif

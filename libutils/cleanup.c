@@ -72,3 +72,20 @@ void RegisterCleanupFunction(CleanupFn fn)
     pthread_mutex_unlock(&cleanup_functions_mutex);
 }
 
+void ClearCleanupFunctions(void)
+{
+    pthread_mutex_lock(&cleanup_functions_mutex);
+
+    CleanupList *p = cleanup_functions;
+    while (p)
+    {
+        CleanupList *cur = p;
+        p = cur->next;
+        free(cur);
+    }
+
+    cleanup_functions = NULL;
+
+    pthread_mutex_unlock(&cleanup_functions_mutex);
+}
+
